@@ -28,3 +28,9 @@ export class BadRequest extends HttpErrorBase {
     super(message, 400);
   }
 }
+
+export class Conflict extends HttpErrorBase {
+  constructor(message) {
+    super(message, 409);
+  }
+}

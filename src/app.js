@@ -1,6 +1,7 @@
+import "@database/init.db.js";
 import express from "express";
 import errorHandler from "@middlewares/error.middleware.js";
-import { router as authRouter } from "@routes/auth.router.js";
+import authRouter from "@routes/auth.router.js";
 
 export const app = express();
 

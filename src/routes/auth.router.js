@@ -1,5 +1,14 @@
 import { Router } from "express";
+import * as controllers from "@controller/user.controller.js";
+import * as middlewares from "@middlewares/user.middleware.js";
 
-export const router = Router();
+const router = Router();
 
-router.get("", (req, res) => res.send("dedo"));
+router.post("/sign-up", middlewares.validateSignUp, controllers.postNewUser);
+router.post(
+  "/sign-in",
+  middlewares.validateSignIn,
+  controllers.authenticateUser,
+);
+
+export default router;
