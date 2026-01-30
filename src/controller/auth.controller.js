@@ -44,7 +44,7 @@ export const authenticateUser = async (req, res, next) => {
       ),
     );
 
-  const token = jwt.sign({ user_id: userDb.id }, process.env.JWT_KEY, {
+  const token = jwt.sign({ user_id: userDb.id }, process.env.JWT_SECRET, {
     algorithm: process.env.JWT_ALGORITHM,
     expiresIn: process.env.JWT_EXPIRE_MINUTE * 60, // In hour
   });
@@ -53,6 +53,7 @@ export const authenticateUser = async (req, res, next) => {
     .cookie("access_token", token, {
       httpOnly: true,
       secure: true,
+      signed: true,
       sameSite: "strict",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     })
