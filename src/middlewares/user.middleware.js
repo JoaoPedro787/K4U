@@ -3,7 +3,7 @@ import { UserCreate, UserSignIn } from "@schemas/user.schema.js";
 
 export const validateSignUp = async (req, _res, next) => {
   try {
-    await UserCreate.validate(req.body);
+    await UserCreate.validateSync(req.body, { stripUnknown: true });
 
     return next();
   } catch (err) {
@@ -13,7 +13,7 @@ export const validateSignUp = async (req, _res, next) => {
 
 export const validateSignIn = async (req, _res, next) => {
   try {
-    await UserSignIn.validate(req.body);
+    await UserSignIn.validateSync(req.body, { stripUnknown: true });
 
     return next();
   } catch (err) {
