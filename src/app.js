@@ -3,7 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import errorHandler from "@middlewares/error.middleware.js";
-import authRouter from "@routes/auth.router.js";
+import { authRouter, gameRouter } from "@routes";
 
 dotenv.config({ path: `${process.cwd()}/src/config/core.env` });
 
@@ -15,5 +15,6 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.get("/", (_req, res) => res.json({ hello: "Hello, World!" }));
 
 app.use("/auth", authRouter);
+app.use("/games", gameRouter);
 
 app.use(errorHandler);
