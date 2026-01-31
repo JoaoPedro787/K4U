@@ -10,6 +10,10 @@ const sequelize = new Sequelize(DB_DATABASE, DB_USER, DB_PASSWORD, {
   port: DB_PORT,
   dialect: "postgres",
   logging: console.log,
+
+  define: {
+    underscored: true,
+  },
 });
 
 export default sequelize;
