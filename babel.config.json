@@ -15,7 +15,8 @@
           "@schemas": "./src/schemas",
           "@services": "./src/services",
           "@utils": "./src/utils",
-          "@mappers": "./src/mappers"
+          "@mappers": "./src/mappers",
+          "@paginations": "./src/paginations"
         }
       }
     ]
