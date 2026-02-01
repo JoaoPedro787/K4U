@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Unauthorized, BadRequest } from "@exceptions/http.exceptions";
+import { Unauthorized, BadRequest } from "@exceptions/http.exception";
 import { UserCreate, UserSignIn } from "@schemas/user.schema.js";
 
 dotenv.config({ path: `${process.cwd()}/src/config/auth.env` });
