@@ -6,7 +6,7 @@ import {
   Conflict,
   NotFound,
   Unauthorized,
-} from "@exceptions/http.exceptions.js";
+} from "@exceptions/http.exception.js";
 import { UserPublic } from "@schemas/user.schema.js";
 
 dotenv.config({ path: `${process.cwd()}/src/config/auth.env` });

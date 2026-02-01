@@ -1,4 +1,4 @@
-import HttpErrorBase from "@exceptions/http.exceptions.js";
+import HttpErrorBase from "@exceptions/http.exception.js";
 
 export default function errorHandler(err, _req, res, _next) {
   console.log(err);
