@@ -9,7 +9,7 @@ const sequelize = new Sequelize(DB_DATABASE, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   port: DB_PORT,
   dialect: "postgres",
-  logging: console.log,
+  logging: false,
 
   define: {
     underscored: true,

@@ -1,7 +1,7 @@
 import sequelize from "./db";
 import "@models";
 
-const createDb = async () => {
+const initDb = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ alter: true });
@@ -12,4 +12,4 @@ const createDb = async () => {
   }
 };
 
-createDb();
+export default initDb;
