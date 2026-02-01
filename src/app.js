@@ -1,15 +1,14 @@
 import express from "express";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import Settings from "@config/settings";
 import errorHandler from "@middlewares/error.middleware.js";
-import { authRouter, gameRouter } from "@routes";
 
-dotenv.config({ path: `${process.cwd()}/src/config/core.env` });
+import { authRouter, gameRouter } from "@routes";
 
 export const app = express();
 
 app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser(Settings.COOKIE_SECRET));
 
 app.get("/", (_req, res) => res.json({ hello: "Hello, World!" }));
 

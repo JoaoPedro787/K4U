@@ -10,5 +10,10 @@ router.post(
   middlewares.validateSignIn,
   controllers.authenticateUser,
 );
+router.delete(
+  "/log-out",
+  middlewares.verifyAuthentication,
+  controllers.logOutUser,
+);
 
 export default router;

@@ -1,15 +1,17 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { Unauthorized, BadRequest } from "@exceptions/http.exception";
-import { UserCreate, UserSignIn } from "@schemas/user.schema.js";
+import Settings from "@config/settings";
+import client from "@caches/redis";
+import * as exceptions from "@exceptions/http.exception";
+import * as schemas from "@schemas/user.schema.js";
 
-dotenv.config({ path: `${process.cwd()}/src/config/auth.env` });
-
-export const verifyAuthentication = (req, _res, next) => {
+export const verifyAuthentication = async (req, _res, next) => {
   const token = req.signedCookies.access_token;
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    // Checking if token is revoked
+    if (await client.get(`revoked:${token}`)) throw new jwt.JsonWebTokenError();
+
+    const verified = jwt.verify(token, Settings.JWT_SECRET);
 
     req.user = verified.user_id;
 
@@ -17,31 +19,35 @@ export const verifyAuthentication = (req, _res, next) => {
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError)
       return next(
-        new Unauthorized("Session expired. Please try signing in again."),
+        new exceptions.Unauthorized(
+          "Session expired. Please try signing in again.",
+        ),
       );
 
     return next(
-      new Unauthorized("Your session is invalid. Please log in again"),
+      new exceptions.Unauthorized(
+        "Your session is invalid. Please log in again",
+      ),
     );
   }
 };
 
 export const validateSignUp = async (req, _res, next) => {
   try {
-    await UserCreate.validateSync(req.body, { stripUnknown: true });
+    await schemas.UserCreate.validateSync(req.body, { stripUnknown: true });
 
     return next();
   } catch (err) {
-    return next(new BadRequest(err.errors));
+    return next(new exceptions.BadRequest(err.errors));
   }
 };
 
 export const validateSignIn = async (req, _res, next) => {
   try {
-    await UserSignIn.validateSync(req.body, { stripUnknown: true });
+    await schemas.UserSignIn.validateSync(req.body, { stripUnknown: true });
 
     return next();
   } catch (err) {
-    return next(new BadRequest(err.errors));
+    return next(new exceptions.BadRequest(err.errors));
   }
 };
