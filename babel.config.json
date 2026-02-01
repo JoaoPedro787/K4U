@@ -16,7 +16,8 @@
           "@services": "./src/services",
           "@utils": "./src/utils",
           "@mappers": "./src/mappers",
-          "@paginations": "./src/paginations"
+          "@paginations": "./src/paginations",
+          "@caches": "./src/caches"
         }
       }
     ]
