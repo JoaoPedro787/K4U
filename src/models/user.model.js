@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "@database/db.js";
 
-const User = sequelize.define("User", {
+export const User = sequelize.define("User", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   username: { type: DataTypes.STRING, unique: true, allowNull: false },
   email: {
@@ -14,5 +14,3 @@ const User = sequelize.define("User", {
   profile_photo: { type: DataTypes.TEXT, allowNull: true },
   disabled: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
-
-export default User;

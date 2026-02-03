@@ -1,2 +1,3 @@
-export { default as authRouter } from "@routes/auth.router";
-export { default as gameRouter } from "@routes/game.router";
+export { default as authRouter } from "./auth.router";
+export { default as gameRouter } from "./game.router";
+export { default as userRouter } from "./user.router";

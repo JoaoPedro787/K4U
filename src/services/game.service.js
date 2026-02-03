@@ -1,4 +1,4 @@
-import { GameEdition, Game } from "@models/game.model";
+import { GameEdition, Game } from "@models";
 
 export const getAllGamesEdtion = async (page, limit, orderBy) => {
   switch (orderBy) {

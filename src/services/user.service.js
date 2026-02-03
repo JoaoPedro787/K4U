@@ -4,12 +4,12 @@ import { User } from "@models";
 export const createUser = async (user, hashedPassword) => {
   const { username, email } = user;
 
-  const [userDb, created] = await User.findOrCreate({
+  const [_userDb, created] = await User.findOrCreate({
     where: { [Op.or]: [{ username }, { email }] },
     defaults: { ...user, hashed_password: hashedPassword },
   });
 
-  return { userDb, created };
+  return { created };
 };
 
 export const getUserByIdentifier = async (identifier) => {
