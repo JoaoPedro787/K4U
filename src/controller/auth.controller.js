@@ -16,7 +16,7 @@ export const postNewUser = async (req, res, next) => {
     return next(new exceptions.Conflict("User already exists."));
   }
 
-  return res.status(201).json({ detail: "User created. Please sign in." });
+  res.status(201).json({ detail: "User created. Please sign in." });
 };
 
 export const authenticateUser = async (req, res, next) => {

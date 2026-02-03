@@ -18,7 +18,7 @@ export const getAllGamesEdtion = async (req, res) => {
 
   const mapped = mappers.mapGameEditionListPublic(rows);
 
-  return res.json({ games: mapped, ...pagination });
+  res.json({ games: mapped, ...pagination });
 };
 
 export const retriveGameEdition = async (req, res, next) => {
@@ -30,5 +30,5 @@ export const retriveGameEdition = async (req, res, next) => {
 
   const mapped = mappers.mapGameEditionPublic(data);
 
-  return res.json(mapped);
+  res.json(mapped);
 };
