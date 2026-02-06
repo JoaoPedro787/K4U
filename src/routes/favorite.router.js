@@ -1,16 +1,24 @@
 import { Router } from "express";
-import * as middlewares from "@middlewares/favorite.middleware";
 import * as controllers from "@controllers/favorite.controller";
+import { schemaValidation } from "@/utils/schema.validation";
+import {
+  FavoriteGameCreate,
+  FavoriteGameDelete,
+} from "@/schemas/favorite.schema";
 
 const router = Router();
 
 router.get("/games", controllers.getFavoriteGames);
 
-router.post("/games", middlewares.validateCreate, controllers.postFavoriteGame);
+router.post(
+  "/games",
+  schemaValidation(FavoriteGameCreate),
+  controllers.postFavoriteGame,
+);
 
 router.delete(
   "/games",
-  middlewares.validateDelete,
+  schemaValidation(FavoriteGameDelete),
   controllers.deleteFavoriteGame,
 );
 

@@ -4,12 +4,12 @@ import { Op } from "sequelize";
 export const createUserRepository = async (user, hashedPassword) => {
   const { username, email } = user;
 
-  const [_userDb, created] = await User.findOrCreate({
+  const [userDb, created] = await User.findOrCreate({
     where: { [Op.or]: [{ username }, { email }] },
     defaults: { ...user, hashed_password: hashedPassword },
   });
 
-  return created;
+  return { userDb, created };
 };
 
 export const getUserByIdentifierRepository = async (identifier) => {

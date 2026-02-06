@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import Settings from "@/settings";
 import { Unauthorized, Conflict } from "@exceptions/http.exception.js";
+import { createUserCartRepository } from "@/repositories/cart.repository";
 import {
   createUserRepository,
   getUserByIdentifierRepository,
@@ -10,9 +11,11 @@ import {
 export const createUserService = async (user) => {
   const hashedPassword = await argon2.hash(user.password);
 
-  const { created } = await createUserRepository(user, hashedPassword);
+  const { userDb, created } = await createUserRepository(user, hashedPassword);
 
   if (!created) throw new Conflict("User already exists.");
+
+  await createUserCartRepository(userDb.id);
 
   return created;
 };

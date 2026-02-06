@@ -1,0 +1,60 @@
+import * as repositories from "@repositories/cart.repository";
+import { mapCartPublic } from "@/mappers/cart.mapper";
+
+import { NotFound } from "@/exceptions/http.exception";
+
+// Cart
+
+export const createUserCartService = (currentUser) => {
+  return repositories.createUserCartRepository(currentUser);
+};
+
+// Cart items
+
+export const getUserCartItemsService = async (currentUser) => {
+  const cartItemDb = await repositories.getUserCartItemsRepository(currentUser);
+
+  return mapCartPublic(cartItemDb);
+};
+
+export const createUserCartItemService = async (currentUser, game) => {
+  const cartId = await repositories.getUserCartRepository(currentUser);
+
+  try {
+    const { cartItemId, created } =
+      await repositories.createUserCartItemRepository(cartId, game);
+    // validar se o jogo existe
+    if (!created)
+      await repositories.incrementUserCartItemRepository(
+        cartItemId,
+        cartId,
+        game.quantity,
+      );
+  } catch {
+    throw new NotFound("Game not found.");
+  }
+};
+
+export const updateUserCartItemService = async (currentUser, cartItem) => {
+  const cartId = await repositories.getUserCartRepository(currentUser);
+
+  const [numberOfAffectedRows] =
+    await repositories.updateUserCartItemRepository(
+      cartItem.id,
+      cartId,
+      cartItem.quantity,
+    );
+
+  if (!numberOfAffectedRows)
+    throw new NotFound("Item not found in user's cart.");
+};
+
+export const deleteUserCartItemService = async (currentUser, cartItemId) => {
+  const cartId = await repositories.getUserCartRepository(currentUser);
+  const deleted = await repositories.deleteUserCartItemRepository(
+    cartItemId,
+    cartId,
+  );
+
+  if (!deleted) throw new NotFound("Item not found in user's cart.");
+};
