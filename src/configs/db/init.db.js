@@ -1,4 +1,4 @@
-import sequelize from "./db";
+import sequelize from ".";
 import "@models";
 
 const initDb = async () => {

@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import sequelize from "@database/db";
+import sequelize from "@configs/db";
 import { generateGameKey } from "@utils/game.format";
 
 const Game = sequelize.define("Game", {

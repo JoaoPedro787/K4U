@@ -1,4 +1,4 @@
-import sequelize from "@database/db";
+import sequelize from "@configs/db";
 import { DataTypes } from "sequelize";
 import { User, GameEdition } from "@models";
 

@@ -1,7 +1,7 @@
-import { Op } from "sequelize";
 import { User } from "@models";
+import { Op } from "sequelize";
 
-export const createUser = async (user, hashedPassword) => {
+export const createUserRepository = async (user, hashedPassword) => {
   const { username, email } = user;
 
   const [_userDb, created] = await User.findOrCreate({
@@ -9,11 +9,11 @@ export const createUser = async (user, hashedPassword) => {
     defaults: { ...user, hashed_password: hashedPassword },
   });
 
-  return { created };
+  return created;
 };
 
-export const getUserByIdentifier = async (identifier) => {
-  return await User.findOne({
+export const getUserByIdentifierRepository = async (identifier) => {
+  return User.findOne({
     where: { [Op.or]: [{ username: identifier }, { email: identifier }] },
   });
 };

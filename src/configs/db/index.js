@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import Settings from "@config/settings";
+import Settings from "@/settings";
 
 const sequelize = new Sequelize(
   Settings.DB_DATABASE,

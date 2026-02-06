@@ -1,34 +1,25 @@
-import * as services from "@services/game.service";
-import * as exceptions from "@exceptions/game.exception";
-import * as mappers from "@mappers/game.mapper";
-import * as paginations from "@paginations/game.pagination";
+import {
+  getAllGamesEditionService,
+  retrieveGameEditionService,
+} from "@services/game.service";
+import { to } from "@/utils";
 
 export const getAllGamesEdtion = async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
   const orderBy = req.query.order_by || "newest";
 
-  const { count, rows } = await services.getAllGamesEdtion(
-    page,
-    limit,
-    orderBy,
-  );
+  const result = await getAllGamesEditionService(page, limit, orderBy);
 
-  const pagination = paginations.gameAllPagination(page, limit, orderBy, count);
-
-  const mapped = mappers.mapGameEditionListPublic(rows);
-
-  res.json({ games: mapped, ...pagination });
+  res.json(result);
 };
 
-export const retriveGameEdition = async (req, res, next) => {
+export const retrieveGameEdition = async (req, res, next) => {
   const editionId = req.params.id;
 
-  const data = await services.retriveGameEdition(editionId);
+  const { data, error } = await to(retrieveGameEditionService(editionId));
 
-  if (!data) return next(new exceptions.GameNotFound());
+  if (error) return next(error);
 
-  const mapped = mappers.mapGameEditionPublic(data);
-
-  res.json(mapped);
+  res.json(data);
 };

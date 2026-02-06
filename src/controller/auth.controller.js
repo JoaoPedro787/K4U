@@ -1,19 +1,17 @@
-import jwt from "jsonwebtoken";
-import argon2 from "argon2";
-import Settings from "@config/settings";
-import client from "@caches/redis";
-import * as services from "@services/user.service.js";
-import * as exceptions from "@exceptions/http.exception.js";
+import redis from "@configs/redis";
+import {
+  createUserService,
+  createUserTokenService,
+} from "@services/auth.service.js";
+import { to } from "@utils";
 
 export const postNewUser = async (req, res, next) => {
   const user = req.body;
 
-  const hashedPassword = await argon2.hash(user.password);
+  const { error } = await to(createUserService(user));
 
-  const { created } = await services.createUser(user, hashedPassword);
-
-  if (!created) {
-    return next(new exceptions.Conflict("User already exists."));
+  if (error) {
+    return next(error);
   }
 
   res.status(201).json({ detail: "User created. Please sign in." });
@@ -22,27 +20,12 @@ export const postNewUser = async (req, res, next) => {
 export const authenticateUser = async (req, res, next) => {
   const user = req.body;
 
-  const userDb = await services.getUserByIdentifier(user.identifier);
+  const { data, error } = await to(createUserTokenService(user));
 
-  if (!userDb)
-    return next(new exceptions.NotFound("Invalid username or password."));
-
-  const verified = await argon2.verify(userDb.hashed_password, user.password);
-
-  if (!verified)
-    return next(
-      new exceptions.Unauthorized(
-        "Couldn't sign in. Check your information and try again.",
-      ),
-    );
-
-  const token = jwt.sign({ user_id: userDb.id }, Settings.JWT_SECRET, {
-    algorithm: Settings.JWT_ALGORITHM,
-    expiresIn: Settings.JWT_EXPIRE_MINUTE * 60, // In hour
-  });
+  if (error) return next(error);
 
   res
-    .cookie("access_token", token, {
+    .cookie("access_token", data, {
       httpOnly: true,
       secure: true,
       signed: true,
@@ -55,6 +38,7 @@ export const authenticateUser = async (req, res, next) => {
 
 export const logOutUser = async (req, res) => {
   const token = req.signedCookies.access_token;
-  await client.set(`revoked:${token}`, 1);
+
+  await redis.set(`revoked:${token}`, 1);
   res.status(204).send();
 };

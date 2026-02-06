@@ -5,9 +5,9 @@
       "module-resolver",
       {
         "alias": {
-          "@config": "./src/config",
-          "@controller": "./src/controller",
-          "@database": "./src/database",
+          "@": "./src/",
+          "@configs": "./src/configs",
+          "@controllers": "./src/controller",
           "@exceptions": "./src/exceptions",
           "@middlewares": "./src/middlewares",
           "@models": "./src/models",
@@ -17,7 +17,7 @@
           "@utils": "./src/utils",
           "@mappers": "./src/mappers",
           "@paginations": "./src/paginations",
-          "@caches": "./src/caches"
+          "@repositories": "./src/repositories"
         }
       }
     ]

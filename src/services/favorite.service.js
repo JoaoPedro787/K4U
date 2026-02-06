@@ -1,23 +1,41 @@
-import { FavoriteGame, GameEdition, Game } from "@models";
+import {
+  createNewFavoriteGameRepository,
+  deleteUserFavoriteGameRepository,
+  listUserFavoriteGamesRepository,
+} from "@/repositories/favorite.repository";
+import { Conflict, NotFound } from "@/exceptions/http.exception";
+import { mapFavoriteGamesListPublic } from "@/mappers/favorite.mapper";
 
-export const createNewFavoriteGame = async (currentUser, favorite) => {
-  const [_favoriteDb, created] = await FavoriteGame.findOrCreate({
-    where: { user_id: currentUser, game_edition_id: favorite.game_edition_id },
-  });
+export const listUserFavoriteGamesService = async (currentUser) => {
+  const favoritesDb = await listUserFavoriteGamesRepository(currentUser);
 
-  return { created };
+  const mapped = mapFavoriteGamesListPublic(favoritesDb);
+
+  return mapped;
 };
 
-export const listUserFavoriteGames = async (currentUser) =>
-  await FavoriteGame.findAll({
-    attributes: ["id"],
-    where: { user_id: currentUser },
-    include: {
-      model: GameEdition,
-      attributes: ["id", "platform", "price"],
-      include: { model: Game, attributes: ["name"] },
-    },
-  });
+export const createNewFavoriteGameService = async (currentUser, favorite) => {
+  const { created } = await createNewFavoriteGameRepository(
+    currentUser,
+    favorite,
+  );
 
-export const deleteUserFavoriteGame = async (currentUser, favoriteId) =>
-  await FavoriteGame.destroy({ where: { id: favoriteId } });
+  if (!created)
+    throw new Conflict("The game is already in the user's favorites list.");
+
+  return created;
+};
+
+export const deleteUserFavoriteGameService = async (
+  currentUser,
+  favoriteId,
+) => {
+  const deleted = await deleteUserFavoriteGameRepository(
+    currentUser,
+    favoriteId,
+  );
+
+  if (!deleted) throw new NotFound("Game not found in the user's list");
+
+  return deleted;
+};

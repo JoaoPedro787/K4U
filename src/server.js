@@ -1,6 +1,6 @@
 import { app } from "./app.js";
-import initDb from "@database/init.db.js";
-import Settings from "@config/settings.js";
+import initDb from "@configs/db/init.db.js";
+import Settings from "@/settings.js";
 
 async function bootstrap() {
   try {
