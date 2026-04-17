@@ -1,15 +1,13 @@
-import { User } from "@models";
 import { Op } from "sequelize";
 
-export const createUserRepository = async (user, hashedPassword) => {
-  const { username, email } = user;
+import { User } from "@models";
 
-  const [userDb, created] = await User.findOrCreate({
-    where: { [Op.or]: [{ username }, { email }] },
-    defaults: { ...user, hashed_password: hashedPassword },
+export const createUserRepository = async (user, transaction = null) => {
+  const userDb = await User.create(user, {
+    transaction,
   });
 
-  return { userDb, created };
+  return userDb.id;
 };
 
 export const getUserByIdentifierRepository = async (identifier) => {

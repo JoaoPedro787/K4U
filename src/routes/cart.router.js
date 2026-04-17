@@ -1,30 +1,33 @@
 import { Router } from "express";
+
 import * as controller from "@controllers/cart.controller";
+
 import {
   CartItemCreate,
   CartItemUpdate,
   CartItemDelete,
 } from "@/schemas/cart.schema";
+
 import { schemaValidation } from "@/utils/schema.validation";
 
 const router = Router();
 
-router.get("/cart", controller.getUserCartItems);
+router.get("/items", controller.getUserCartItems);
 
 router.post(
-  "/cart",
+  "/items",
   schemaValidation(CartItemCreate),
   controller.postUserCartItems,
 );
 
 router.put(
-  "/cart",
+  "/items",
   schemaValidation(CartItemUpdate),
   controller.updateUserCartItem,
 );
 
 router.delete(
-  "/cart",
+  "/items",
   schemaValidation(CartItemDelete),
   controller.deleteUserCartItem,
 );

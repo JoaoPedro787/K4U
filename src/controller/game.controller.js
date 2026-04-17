@@ -1,8 +1,9 @@
+import { to } from "@/utils";
+
 import {
   getAllGamesEditionService,
   retrieveGameEditionService,
 } from "@services/game.service";
-import { to } from "@/utils";
 
 export const getAllGamesEdtion = async (req, res) => {
   const page = Number(req.query.page) || 1;

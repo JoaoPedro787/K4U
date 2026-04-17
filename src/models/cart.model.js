@@ -17,10 +17,12 @@ export const Cart = sequelize.define("Cart", {
     type: DataTypes.VIRTUAL,
     get() {
       if (!this.CartItems) return null;
-      let total = 0;
-      this.CartItems.map((el) => (total += Number(el.subtotal)));
+      const total = this.CartItems.reduce(
+        (sum, el) => sum + el.GameEdition.price * el.quantity,
+        0,
+      ).toFixed(2);
 
-      return total.toFixed(2);
+      return total;
     },
   },
 });
@@ -42,6 +44,7 @@ export const CartItem = sequelize.define("CartItem", {
   quantity: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
+    allowNull: false,
   },
   subtotal: {
     type: DataTypes.VIRTUAL,

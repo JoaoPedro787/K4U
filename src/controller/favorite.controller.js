@@ -1,9 +1,10 @@
+import { to } from "@/utils";
+
 import {
   createNewFavoriteGameService,
   listUserFavoriteGamesService,
   deleteUserFavoriteGameService,
 } from "@services/favorite.service";
-import { to } from "@/utils";
 
 export const getFavoriteGames = async (req, res) => {
   const currentUser = req.user;

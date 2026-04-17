@@ -1,6 +1,9 @@
 import { Router } from "express";
+
 import * as controllers from "@controllers/favorite.controller";
+
 import { schemaValidation } from "@/utils/schema.validation";
+
 import {
   FavoriteGameCreate,
   FavoriteGameDelete,

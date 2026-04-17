@@ -1,13 +1,13 @@
 import { Router } from "express";
 
-// Routes
-import favoriteRouter from "./favorite.router";
-import cartRouter from "./cart.router";
+import { orderRouter, cartRouter, favoriteRouter } from "@routes";
 
 const router = Router();
 
-router.use("/favorite", favoriteRouter);
+router.use("/favorites", favoriteRouter);
 
-router.use(cartRouter);
+router.use("/cart", cartRouter);
+
+router.use("/orders", orderRouter);
 
 export default router;

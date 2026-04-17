@@ -1,9 +1,11 @@
+import { Conflict, NotFound } from "@/exceptions/http.exception";
+
 import {
   createNewFavoriteGameRepository,
   deleteUserFavoriteGameRepository,
   listUserFavoriteGamesRepository,
 } from "@/repositories/favorite.repository";
-import { Conflict, NotFound } from "@/exceptions/http.exception";
+
 import { mapFavoriteGamesListPublic } from "@/mappers/favorite.mapper";
 
 export const listUserFavoriteGamesService = async (currentUser) => {

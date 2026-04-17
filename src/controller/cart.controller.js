@@ -1,6 +1,6 @@
-import * as services from "@services/cart.service";
-
 import { to } from "@/utils";
+
+import * as services from "@services/cart.service";
 
 export const getUserCartItems = async (req, res) => {
   const user = req.user;

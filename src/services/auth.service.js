@@ -1,23 +1,43 @@
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
+
 import Settings from "@/settings";
-import { Unauthorized, Conflict } from "@exceptions/http.exception.js";
+
+import sequelize from "@/configs/db";
+
+import { Unauthorized } from "@exceptions/http.exception.js";
+
+import { mapUserToDb } from "@/mappers/auth.mapper";
+
 import { createUserCartRepository } from "@/repositories/cart.repository";
+
 import {
   createUserRepository,
   getUserByIdentifierRepository,
 } from "@/repositories/auth.repository";
+import { parseUniqueError } from "@/helpers/auth.helper";
 
 export const createUserService = async (user) => {
-  const hashedPassword = await argon2.hash(user.password);
+  const t = await sequelize.transaction();
 
-  const { userDb, created } = await createUserRepository(user, hashedPassword);
+  try {
+    const hashedPassword = await argon2.hash(user.password);
 
-  if (!created) throw new Conflict("User already exists.");
+    const userMapped = mapUserToDb(user, hashedPassword);
 
-  await createUserCartRepository(userDb.id);
+    const userId = await createUserRepository(userMapped, t);
 
-  return created;
+    await createUserCartRepository(userId, t);
+
+    t.commit();
+  } catch (err) {
+    await t.rollback();
+
+    const parsed = parseUniqueError(err);
+    if (parsed) throw parsed;
+
+    throw err;
+  }
 };
 
 export const createUserTokenService = async (user) => {

@@ -1,5 +1,5 @@
-import { Game, GameEdition, GameKey } from "@models/game.model";
-import sequelize from "@database/db";
+import { Game, GameEdition, GameKey } from "@models";
+import sequelize from "@configs/db";
 
 const platforms = ["PC", "XBOX", "PLAYSTATION"];
 

@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
+
 import Settings from "@/settings";
+
 import redis from "@configs/redis";
+
 import { Unauthorized } from "@/exceptions/http.exception";
 
 export const verifyAuthentication = async (req, _res, next) => {

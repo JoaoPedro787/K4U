@@ -1,5 +1,5 @@
 export const mapCartPublic = (row) => {
-  if (!row) return null;
+  if (row?.CartItems.length < 1) return [];
 
   return {
     total: row.total,

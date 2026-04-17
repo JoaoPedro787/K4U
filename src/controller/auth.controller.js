@@ -1,9 +1,11 @@
 import redis from "@configs/redis";
+
+import { to } from "@utils";
+
 import {
   createUserService,
   createUserTokenService,
 } from "@services/auth.service.js";
-import { to } from "@utils";
 
 export const postNewUser = async (req, res, next) => {
   const user = req.body;

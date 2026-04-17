@@ -13,6 +13,7 @@ const Game = sequelize.define("Game", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  thumbnail: { type: DataTypes.TEXT, allowNull: true },
 });
 
 const GameEdition = sequelize.define(
@@ -49,41 +50,50 @@ const GameEdition = sequelize.define(
   },
 );
 
-const GameKey = sequelize.define("GameKey", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+const GameKey = sequelize.define(
+  "GameKey",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-  key: {
-    type: DataTypes.STRING(17),
-    allowNull: false,
-    unique: true,
-    defaultValue: generateGameKey,
-  },
+    key: {
+      type: DataTypes.STRING(17),
+      allowNull: false,
+      unique: true,
+      defaultValue: generateGameKey,
+    },
 
-  status: {
-    type: DataTypes.ENUM("AVAILABLE", "RESERVED", "USED"),
-    allowNull: false,
-    defaultValue: "AVAILABLE",
-  },
+    status: {
+      type: DataTypes.ENUM("AVAILABLE", "RESERVED", "USED"),
+      allowNull: false,
+      defaultValue: "AVAILABLE",
+    },
 
-  reserved_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
+    reserved_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
 
-  used_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
+    used_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
 
-  game_edition_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+    game_edition_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
-});
+  {},
+);
 
 // Relations
 

@@ -20,4 +20,9 @@ export default class Settings {
   static JWT_SECRET = process.env.JWT_SECRET;
   static JWT_ALGORITHM = process.env.JWT_ALGORITHM;
   static JWT_EXPIRE_MINUTE = process.env.JWT_EXPIRE_MINUTE;
+
+  // STRIPLE
+  static STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+  static STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  static STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 }

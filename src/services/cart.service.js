@@ -1,7 +1,8 @@
-import * as repositories from "@repositories/cart.repository";
-import { mapCartPublic } from "@/mappers/cart.mapper";
-
 import { NotFound } from "@/exceptions/http.exception";
+
+import * as repositories from "@repositories/cart.repository";
+
+import { mapCartPublic } from "@/mappers/cart.mapper";
 
 // Cart
 
@@ -23,7 +24,6 @@ export const createUserCartItemService = async (currentUser, game) => {
   try {
     const { cartItemId, created } =
       await repositories.createUserCartItemRepository(cartId, game);
-    // validar se o jogo existe
     if (!created)
       await repositories.incrementUserCartItemRepository(
         cartItemId,
