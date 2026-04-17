@@ -12,7 +12,7 @@ export const app = express();
 
 app.use(
   express.json({
-    verify: (req, res, buf) => {
+    verify: (req, _res, buf) => {
       if (req.originalUrl.includes("/payment/webhook")) {
         req.rawBody = buf;
       }
@@ -28,13 +28,3 @@ app.use("/auth", authRouter);
 app.use("/games", gameRouter);
 app.use("/payment", paymentRouter);
 app.use(errorHandler);
-
-/*
-TODO: NEXT STEPS
-
-- TESTAR A API
-- SERIA LEGAL PEDIR PARA A IA LOGAR AS ROTAS
-- ADICIONAR PAGINATION NO FAVORITES GAMES
-
-
-*/
