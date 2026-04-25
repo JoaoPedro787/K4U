@@ -1,3 +1,5 @@
+import sequelize from "@/configs/db";
+
 import {
   mapGameEditionListPublic,
   mapGameEditionPublic,
@@ -12,18 +14,35 @@ import {
 
 import { NotFound } from "@/exceptions/http.exception";
 
-export const getAllGamesEditionService = async (page, limit, orderBy) => {
+export const getAllGamesEditionService = async (
+  page,
+  search,
+  limit,
+  orderBy,
+) => {
   switch (orderBy) {
     case "newest":
-      orderBy = "DESC";
+      orderBy = ["createdAt", "DESC"];
+      break;
     case "oldest":
-      orderBy = "ASC";
+      orderBy = ["createdAt", "ASC"];
+      break;
+    case "price_desc":
+      orderBy = ["price", "DESC"];
+      break;
+    case "price_asc":
+      orderBy = ["price", "ASC"];
+      break;
+    case "random":
+      orderBy = sequelize.random();
+      break;
     default:
-      orderBy = "DESC";
+      orderBy = ["createdAt", "DESC"];
   }
 
   const { count, rows } = await getAllGamesEditionRepository(
     page,
+    search,
     limit,
     orderBy,
   );

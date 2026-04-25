@@ -11,6 +11,8 @@ export const getFavoriteGames = async (req, res) => {
 
   const result = await listUserFavoriteGamesService(currentUser);
 
+  req.logMessage = "getting user's favorite games";
+
   res.json(result);
 };
 
@@ -18,13 +20,16 @@ export const postFavoriteGame = async (req, res, next) => {
   const currentUser = req.user;
   const favorite = req.body;
 
-  const { error } = await to(
+  const { error, data } = await to(
     createNewFavoriteGameService(currentUser, favorite),
   );
 
   if (error) return next(error);
 
-  res.status(201).json({ detail: "Favorite game added to user's list." });
+  req.logMessage = "user added game to favorites";
+  req.logExtras = { game_edition_id: favorite.game_edition_id };
+
+  res.status(201).json(data);
 };
 
 export const deleteFavoriteGame = async (req, res, next) => {
@@ -36,6 +41,9 @@ export const deleteFavoriteGame = async (req, res, next) => {
   );
 
   if (error) return next(error);
+
+  req.logMessage = "user removed game to favorites";
+  req.logExtras = { favorite_id: favorite.id };
 
   res.status(204).send();
 };

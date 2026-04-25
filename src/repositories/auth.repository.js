@@ -7,7 +7,7 @@ export const createUserRepository = async (user, transaction = null) => {
     transaction,
   });
 
-  return userDb.id;
+  return userDb;
 };
 
 export const getUserByIdentifierRepository = async (identifier) => {

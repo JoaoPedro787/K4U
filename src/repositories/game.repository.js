@@ -1,12 +1,52 @@
-import { GameEdition, Game } from "@/models";
+import { GameEdition, Game, GameKey, GameAsset } from "@/models";
+import { KeyStatusEnum } from "@/schemas/keys.schema";
 
-export const getAllGamesEditionRepository = (page, limit, orderBy) =>
+import { Op } from "sequelize";
+
+export const getAllGamesEditionRepository = (page, search, limit, orderBy) =>
   GameEdition.findAndCountAll({
-    include: Game,
+    include: [
+      {
+        model: Game,
+        where: search
+          ? {
+              name: {
+                [Op.iLike]: `%${search}%`,
+              },
+            }
+          : {},
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+      {
+        model: GameKey,
+        where: { status: KeyStatusEnum.AVAILABLE },
+      },
+    ],
     offset: (page - 1) * limit,
     limit,
-    order: [[["createdAt", orderBy]]],
+    order: [orderBy],
+    distinct: true,
   });
 
 export const retrieveGameEditionRepository = (game_id) =>
-  GameEdition.findByPk(game_id, { include: Game });
+  GameEdition.findOne({
+    include: [
+      {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+      {
+        model: GameKey,
+        where: { status: KeyStatusEnum.AVAILABLE },
+      },
+    ],
+    where: { id: game_id },
+  });

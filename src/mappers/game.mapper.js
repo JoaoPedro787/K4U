@@ -5,7 +5,11 @@ export const mapGameEditionPublic = (row) => {
     id: row.id ?? null,
     platform: row.platform ?? null,
     price: row.price ?? null,
-    gameName: row.Game?.name ?? null,
+    game_name: row.Game?.name ?? null,
+    stock_count: row.stock_count,
+    thumbnail: row.Game?.GameAsset?.thumbnail ?? null,
+    cover: row.Game?.GameAsset?.cover ?? null,
+    carousel: row.Game?.GameAsset?.carousel ?? null,
   };
 };
 

@@ -20,7 +20,7 @@ router.post(
   controller.postUserCartItems,
 );
 
-router.put(
+router.patch(
   "/items",
   schemaValidation(CartItemUpdate),
   controller.updateUserCartItem,

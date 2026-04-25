@@ -1,50 +1,57 @@
+import pino from "pino";
+
+import sequelize from "@/configs/db";
 import { stripe } from "@/configs/stripe";
 
 import { NotFound } from "@/exceptions/http.exception";
 
+import { assignKeysToOrder } from "@/repositories/keys.repository";
+
 import {
-  getOrderWithItemsRepository,
-  updateOrderStatusRepository,
-} from "@/repositories/payment.repository";
+  completeOrderRepository,
+  userBelongsToOrder,
+} from "@/repositories/order.repository";
 
-export const createCheckoutSessionService = async (userId, orderId) => {
-  const order = await getOrderWithItemsRepository(userId, orderId);
+import { get } from "@/configs/redis";
 
-  if (!order) throw new NotFound("Order not found.");
-
-  const lineItems = order.OrderItems.map((item) => ({
-    price_data: {
-      currency: "brl",
-      product_data: {
-        name: `${item.GameEdition.Game.name} - ${item.GameEdition.platform}`,
-        description: `Game Edition: ${item.GameEdition.platform}`,
-      },
-      unit_amount: Math.round(item.unity_price * 100),
-    },
-    quantity: item.quantity,
-  }));
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: lineItems,
-    mode: "payment",
-    success_url: `http://localhost:8000/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `http://localhost:8000/payment/cancel`,
-    metadata: {
-      order_id: order.id,
-      user_id: userId,
-    },
-  });
-
-  return { sessionId: session.id, url: session.url };
-};
+const logger = pino();
 
 export const processWebhookService = async (event) => {
   const session = event.data.object;
   const orderId = session.metadata.order_id;
-  // const userId = session.metadata.user_id; // TODO: VOU VER SE VOU PRECISAR
 
-  await updateOrderStatusRepository(orderId, "COMPLETED");
+  const t = await sequelize.transaction();
 
-  return orderId;
+  try {
+    // Atribuir keys reservadas ao pedido
+    await assignKeysToOrder(orderId, t);
+
+    // Atualizar status do pedido para COMPLETED
+    await completeOrderRepository(orderId);
+
+    await t.commit();
+  } catch (err) {
+    if (!t.finished) await t.rollback();
+    throw err;
+  }
+};
+
+export const getOrderPaymentService = async (user, orderId) => {
+  const belongs = await userBelongsToOrder(user, orderId);
+
+  if (!belongs) throw new NotFound("Order not found.");
+
+  return await get(`order:${orderId}`);
+};
+
+export const cancelPayment = async (sessionId) => {
+  try {
+    await stripe.checkout.sessions.expire(sessionId);
+
+    return true;
+  } catch (err) {
+    logger.warn({ msg: "stripe expire error", err: err.message });
+
+    return false;
+  }
 };

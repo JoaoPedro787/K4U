@@ -6,7 +6,12 @@ import {
   listUserFavoriteGamesRepository,
 } from "@/repositories/favorite.repository";
 
-import { mapFavoriteGamesListPublic } from "@/mappers/favorite.mapper";
+import { retrieveGameEditionRepository } from "@/repositories/game.repository";
+
+import {
+  mapFavoriteGamesListPublic,
+  mapFavoriteGamesPublic,
+} from "@/mappers/favorite.mapper";
 
 export const listUserFavoriteGamesService = async (currentUser) => {
   const favoritesDb = await listUserFavoriteGamesRepository(currentUser);
@@ -17,15 +22,25 @@ export const listUserFavoriteGamesService = async (currentUser) => {
 };
 
 export const createNewFavoriteGameService = async (currentUser, favorite) => {
-  const { created } = await createNewFavoriteGameRepository(
+  const { game_edition_id } = favorite;
+
+  const game = await retrieveGameEditionRepository(game_edition_id);
+
+  if (!game) {
+    throw new NotFound("Game not found.");
+  }
+
+  const { favoriteDb, created } = await createNewFavoriteGameRepository(
     currentUser,
-    favorite,
+    game.id,
   );
 
   if (!created)
     throw new Conflict("The game is already in the user's favorites list.");
 
-  return created;
+  const rep = mapFavoriteGamesPublic(favoriteDb);
+
+  return rep;
 };
 
 export const deleteUserFavoriteGameService = async (

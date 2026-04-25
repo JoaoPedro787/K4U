@@ -1,19 +1,17 @@
-import sequelize from "@/configs/db";
-import { setOrderEvent } from "@/configs/redis/order.event";
+import Settings from "@/settings";
 
-import {
-  BadRequest,
-  NotFound,
-  Unauthorized,
-} from "@/exceptions/http.exception";
+import sequelize from "@/configs/db";
+import { set } from "@/configs/redis";
+
+import { BadRequest, NotFound } from "@/exceptions/http.exception";
 
 // Repos
 import {
   createOrderRepository,
   createOrderItemsListRepository,
+  getOrderItemsRepository,
   getUserOrderRepository,
   getOrderRepository,
-  completeOrderRepository,
 } from "@/repositories/order.repository";
 
 import {
@@ -22,15 +20,15 @@ import {
   deleteAllUserCartItemRepository,
 } from "@/repositories/cart.repository";
 
-import {
-  checkGameKeyAvailability,
-  reserveGameKeys,
-  releaseReservedKeys,
-  assignKeysToOrder,
-} from "@/repositories/keys.repository";
+import { reserveGameKeys } from "@/repositories/keys.repository";
+
+import { mapToLineItems, sessionMaker } from "@/helpers/payment.helper";
 
 import { mapCartItemsToCheckoutList } from "@/mappers/checkout.mapper";
 import { mapOrderList, mapOrder } from "@/mappers/order.mapper";
+
+import { minuteToSeconds } from "@/utils/time.format";
+import { getUserEmail } from "@/repositories/user.repository";
 
 export const createFullOrderService = async (currentUser) => {
   const t = await sequelize.transaction();
@@ -41,27 +39,24 @@ export const createFullOrderService = async (currentUser) => {
     const cartItems = await getCartItemsForCheckoutRepository(cartId, t);
 
     if (cartItems.length < 1)
-      throw new Unauthorized("No items on cart. Please add items to proceed.");
+      throw new BadRequest("No items on cart. Please add items to proceed.");
+
+    const orderDb = await createOrderRepository(currentUser, t);
 
     // Validando estoque de keys
     for (const item of cartItems) {
-      const isAvailable = await checkGameKeyAvailability(
+      const reservedKeys = await reserveGameKeys(
         item.game_edition_id,
         item.quantity,
+        orderDb.id,
         t,
       );
-      if (!isAvailable) {
+
+      if (reservedKeys < item.quantity) {
         throw new BadRequest(
           `Insufficient keys for game: ${item.GameEdition.Game.name} - Platform: ${item.GameEdition.platform}`,
         );
       }
-    }
-
-    const orderDb = await createOrderRepository(currentUser, t);
-
-    // Reservar keys para o pedido
-    for (const item of cartItems) {
-      await reserveGameKeys(item.game_edition_id, item.quantity, orderDb.id, t);
     }
 
     const mappedItems = mapCartItemsToCheckoutList(cartItems, orderDb.id);
@@ -70,11 +65,33 @@ export const createFullOrderService = async (currentUser) => {
     await createOrderItemsListRepository(mappedItems, t);
     await deleteAllUserCartItemRepository(cartId);
 
+    const orderItems = await getOrderItemsRepository(orderDb.id, t);
+
+    const email = await getUserEmail(currentUser, t);
+
     await t.commit();
 
-    await setOrderEvent({ id: orderDb.id, expire_date: orderDb.expire_date });
+    // Stripe payment
+
+    const lineItems = mapToLineItems(orderItems);
+
+    // Payment session
+    const session = await sessionMaker(
+      orderDb.id,
+      lineItems,
+      email,
+      currentUser,
+    );
+
+    await set(
+      `order:${orderDb.id}:${session.id}`,
+      session.url,
+      minuteToSeconds(Settings.STRIPE_EXPIRE_MINUTE),
+    );
+
+    return { orderId: orderDb.id, sessionId: session.id, url: session.url };
   } catch (err) {
-    await t.rollback();
+    if (!t.finished) await t.rollback();
     throw err;
   }
 };
@@ -95,38 +112,4 @@ export const getOrderService = async (currentUser, orderId) => {
   const mapped = mapOrder(order);
 
   return mapped;
-};
-
-export const completeOrderService = async (orderId) => {
-  const t = await sequelize.transaction();
-
-  try {
-    // Atribuir keys reservadas ao pedido
-    await assignKeysToOrder(orderId, t);
-
-    // Atualizar status do pedido para COMPLETED
-    await completeOrderRepository(orderId);
-
-    await t.commit();
-  } catch (err) {
-    await t.rollback();
-    throw err;
-  }
-};
-
-export const cancelOrderService = async (orderId) => {
-  const t = await sequelize.transaction();
-
-  try {
-    // Liberar keys reservadas
-    await releaseReservedKeys(orderId, t);
-
-    // Atualizar status do pedido para CANCELLED
-    await cancelOrderRepository(orderId);
-
-    await t.commit();
-  } catch (err) {
-    await t.rollback();
-    throw err;
-  }
 };

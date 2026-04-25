@@ -1,25 +1,47 @@
-import { FavoriteGame, GameEdition, Game } from "@models";
+import { FavoriteGame, GameEdition, Game, GameAsset } from "@models";
 
 export const createNewFavoriteGameRepository = async (
   currentUser,
-  favorite,
+  game_edition_id,
 ) => {
-  const [_favoriteDb, created] = await FavoriteGame.findOrCreate({
-    where: { user_id: currentUser, game_edition_id: favorite.game_edition_id },
+  const [favoriteDb, created] = await FavoriteGame.findOrCreate({
+    where: { user_id: currentUser, game_edition_id: game_edition_id },
   });
 
-  return { created };
+  if (created) {
+    await favoriteDb.reload({
+      include: {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  return { favoriteDb, created };
 };
 
 export const listUserFavoriteGamesRepository = (currentUser) =>
   FavoriteGame.findAll({
-    attributes: ["id"],
     where: { user_id: currentUser },
     include: {
       model: GameEdition,
-      attributes: ["id", "platform", "price"],
-      include: { model: Game, attributes: ["name"] },
+      include: {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
     },
+    order: [["createdAt", "DESC"]],
   });
 
 export const deleteUserFavoriteGameRepository = (currentUser, favoriteId) =>

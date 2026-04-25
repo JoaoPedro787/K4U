@@ -4,10 +4,11 @@ import argon2 from "argon2";
 import Settings from "@/settings";
 
 import sequelize from "@/configs/db";
+import { set } from "@/configs/redis";
 
 import { Unauthorized } from "@exceptions/http.exception.js";
 
-import { mapUserToDb } from "@/mappers/auth.mapper";
+import { mapUserToDb, mapUserToRep } from "@/mappers/auth.mapper";
 
 import { createUserCartRepository } from "@/repositories/cart.repository";
 
@@ -16,6 +17,7 @@ import {
   getUserByIdentifierRepository,
 } from "@/repositories/auth.repository";
 import { parseUniqueError } from "@/helpers/auth.helper";
+import { minuteToSeconds } from "@/utils/time.format";
 
 export const createUserService = async (user) => {
   const t = await sequelize.transaction();
@@ -25,13 +27,17 @@ export const createUserService = async (user) => {
 
     const userMapped = mapUserToDb(user, hashedPassword);
 
-    const userId = await createUserRepository(userMapped, t);
+    const userDb = await createUserRepository(userMapped, t);
 
-    await createUserCartRepository(userId, t);
+    await createUserCartRepository(userDb.id, t);
 
     t.commit();
+
+    const rep = mapUserToRep(userDb);
+
+    return rep;
   } catch (err) {
-    await t.rollback();
+    if (!t.finished) await t.rollback();
 
     const parsed = parseUniqueError(err);
     if (parsed) throw parsed;
@@ -57,5 +63,12 @@ export const createUserTokenService = async (user) => {
     expiresIn: Settings.JWT_EXPIRE_MINUTE * 60, // In hour
   });
 
-  return token;
+  return { user_id: userDb.id, token };
 };
+
+export const logOutUserService = async (access_token) =>
+  await set(
+    `revoked:${access_token}`,
+    1,
+    minuteToSeconds(Settings.JWT_EXPIRE_MINUTE),
+  );

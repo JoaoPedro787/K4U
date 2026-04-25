@@ -19,8 +19,15 @@ export const createCheckoutSession = async (req, res, next) => {
     return next(error);
   }
 
+  req.logMessage = "payment created";
+  req.logExtras = {
+    order_id: order_id,
+    payment_url: data.url,
+    payment_session: data.sessionId,
+  };
+
   res.status(200).json({
-    success: true,
+    message: "Payment created. Please click the link below.",
     data: {
       sessionId: data.sessionId,
       url: data.url,
@@ -35,6 +42,16 @@ export const handleWebhook = async (req, res, next) => {
 
   if (error) return next(error);
 
+  const session = event.data.object;
+  const orderId = session.metadata.order_id;
+  // const userId = session.metadata.user_id;
+
+  req.logMessage = "webhook processed successfully";
+  req.logExtras = {
+    order_id: orderId,
+    payment_session: session.id,
+  };
+
   res.status(200).json({
     message: "Webhook processed successfully",
     order_id: data,
@@ -48,8 +65,12 @@ export const getPaymentSuccess = async (req, res, next) => {
     return next(new BadRequest("Session ID is required"));
   }
 
+  req.logMessage = "payment completed";
+  req.logExtras = {
+    payment_session: session_id,
+  };
+
   res.status(200).json({
-    success: true,
     message: "Payment completed successfully",
     data: {
       sessionId: session_id,
@@ -57,7 +78,16 @@ export const getPaymentSuccess = async (req, res, next) => {
   });
 };
 
-export const getPaymentCancel = async (_req, res) => {
+export const getPaymentCancel = async (req, res) => {
+  const event = req.stripeEvent;
+
+  const session = event.data.object;
+
+  req.logMessage = "payment canceled";
+  req.logExtras = {
+    payment_session: session,
+  };
+
   res.status(200).json({
     message: "Payment was cancelled",
   });

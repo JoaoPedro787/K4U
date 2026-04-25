@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 import Settings from "@/settings";
 
-import redis from "@configs/redis";
+import { get } from "@/configs/redis";
 
 import { Unauthorized } from "@/exceptions/http.exception";
 
@@ -11,7 +11,7 @@ export const verifyAuthentication = async (req, _res, next) => {
 
   try {
     // Checking if token is revoked
-    if (await redis.get(`revoked:${token}`)) throw new jwt.JsonWebTokenError();
+    if (await get(`revoked:${token}`)) throw new jwt.JsonWebTokenError();
 
     const verified = jwt.verify(token, Settings.JWT_SECRET);
 

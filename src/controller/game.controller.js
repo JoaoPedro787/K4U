@@ -9,8 +9,9 @@ export const getAllGamesEdtion = async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 30;
   const orderBy = req.query.order_by || "newest";
+  const search = req.query.search || null;
 
-  const result = await getAllGamesEditionService(page, limit, orderBy);
+  const result = await getAllGamesEditionService(page, search, limit, orderBy);
 
   res.json(result);
 };

@@ -1,6 +1,5 @@
 import sequelize from "@/configs/db";
 import { DataTypes } from "sequelize";
-import { User, GameEdition } from "@models";
 
 export const Cart = sequelize.define("Cart", {
   id: {
@@ -53,17 +52,4 @@ export const CartItem = sequelize.define("CartItem", {
       return (this.GameEdition.price * this.quantity).toFixed(2);
     },
   },
-});
-
-// User -> Cart | Cart -> User
-User.hasOne(Cart, { foreignKey: "user_id" });
-Cart.belongsTo(User, { foreignKey: "user_id" });
-
-// Cart -> CartItem | CartItem -> Cart
-Cart.hasMany(CartItem, { foreignKey: "cart_id" });
-CartItem.belongsTo(Cart, { foreignKey: "cart_id" });
-
-// CartItem -> Cart
-CartItem.belongsTo(GameEdition, {
-  foreignKey: "game_edition_id",
 });

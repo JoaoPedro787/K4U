@@ -1,4 +1,8 @@
-import { Order, OrderItem, GameEdition, Game } from "@models";
+import { Op } from "sequelize";
+
+import { Order, OrderItem, GameEdition, Game, GameAsset } from "@models";
+
+import { OrderStatusEnum } from "@/schemas/order.schema";
 
 // Order
 export const createOrderRepository = async (currentUser, transaction = null) =>
@@ -9,8 +13,23 @@ export const getOrderRepository = (currentUser, orderId) =>
     where: { user_id: currentUser, id: orderId },
     include: {
       model: OrderItem,
-      include: { model: GameEdition, include: { model: Game } },
+      include: {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
     },
+  });
+
+export const userBelongsToOrder = (user, orderId) =>
+  Order.findOne({
+    where: { user_id: user, id: orderId, status: OrderStatusEnum.PENDING },
   });
 
 export const getUserOrderRepository = (currentUser) =>
@@ -18,35 +37,80 @@ export const getUserOrderRepository = (currentUser) =>
     where: { user_id: currentUser },
     include: {
       model: OrderItem,
-      include: { model: GameEdition, include: { model: Game } },
+      include: {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
     },
+    order: [["createdAt", "DESC"]],
   });
 
+export const deleteExpiredOrdersRepo = (transaction = null) =>
+  Order.update(
+    { status: OrderStatusEnum.CANCELED },
+    {
+      where: {
+        status: OrderStatusEnum.PENDING,
+        expire_date: { [Op.lte]: new Date() },
+      },
+      returning: true,
+      transaction,
+    },
+  );
+
 export const cancelOrderRepository = async (orderId) => {
-  return await Order.update(
-    { status: "CANCELLED" },
+  const [affectedCount] = await Order.update(
+    { status: OrderStatusEnum.CANCELED },
     {
       where: {
         id: orderId,
-        status: "PENDING",
+        status: OrderStatusEnum.PENDING,
       },
     },
   );
+
+  return affectedCount > 0;
 };
 
 export const completeOrderRepository = async (orderId) => {
   return await Order.update(
-    { status: "COMPLETED" },
+    { status: OrderStatusEnum.COMPLETED },
     {
       where: {
         id: orderId,
-        status: "PENDING",
+        status: OrderStatusEnum.PENDING,
       },
     },
   );
 };
 
 // Order Items
-
 export const createOrderItemsListRepository = (items, transaction = null) =>
   OrderItem.bulkCreate(items, transaction);
+
+export const getOrderItemsRepository = async (orderId, transaction = null) => {
+  const orderItems = await OrderItem.findAll({
+    where: { order_id: orderId },
+    include: {
+      model: GameEdition,
+      include: {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+    },
+    transaction,
+  });
+
+  return orderItems;
+};

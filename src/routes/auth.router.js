@@ -2,8 +2,6 @@ import { Router } from "express";
 
 import * as controllers from "@controllers/auth.controller.js";
 
-import { verifyAuthentication } from "@middlewares/auth.middleware.js";
-
 import { schemaValidation } from "@utils/schema.validation";
 
 import { UserCreate, UserSignIn } from "@schemas/auth.schema";
@@ -18,6 +16,6 @@ router.post(
   controllers.authenticateUser,
 );
 
-router.delete("/log-out", verifyAuthentication, controllers.logOutUser);
+router.delete("/log-out", controllers.logOutUser);
 
 export default router;

@@ -1,14 +1,18 @@
+import pino from "pino";
+
 import sequelize from ".";
 import "@models";
+
+const logger = pino();
 
 const initDb = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ alter: true });
 
-    console.log("Connection has been established successfully.");
+    logger.info("Connection has been established successfully with database.");
   } catch (err) {
-    console.error("Unable to connect to the database:", err);
+    logger.error({ msg: "Unable to connect to the database", err });
   }
 };
 

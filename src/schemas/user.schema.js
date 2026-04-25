@@ -14,3 +14,7 @@ export const UserSignIn = Yup.object({
   identifier: Yup.string().required(),
   password: Yup.string().min(8).required(),
 });
+
+export const UserUpdate = Yup.object({
+  profile_photo: Yup.string().required(),
+});

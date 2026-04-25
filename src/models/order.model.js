@@ -1,12 +1,13 @@
-import sequelize from "@configs/db";
 import { DataTypes } from "sequelize";
-import { User, GameEdition, GameKey } from "@models";
+
+import sequelize from "@configs/db";
+import Settings from "@/settings";
 
 export const Order = sequelize.define("Order", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   user_id: { type: DataTypes.INTEGER, allowNull: false },
   status: {
-    type: DataTypes.ENUM("PENDING", "CANCELLED", "COMPLETED"),
+    type: DataTypes.ENUM("PENDING", "CANCELED", "COMPLETED"),
     allowNull: false,
     defaultValue: "PENDING",
   },
@@ -14,7 +15,7 @@ export const Order = sequelize.define("Order", {
     type: DataTypes.DATE,
     defaultValue: () => {
       const d = new Date();
-      d.setMinutes(d.getMinutes() + 30);
+      d.setMinutes(d.getMinutes() + Settings.STRIPE_EXPIRE_MINUTE);
       return d;
     },
   },
@@ -59,17 +60,3 @@ export const OrderItem = sequelize.define("OrderItem", {
     },
   },
 });
-
-// User <-> Order 1:N
-User.hasMany(Order, { foreignKey: "user_id" });
-Order.belongsTo(User, { foreignKey: "user_id" });
-
-// Order <-> OrderItems 1:N
-Order.hasMany(OrderItem, { foreignKey: "order_id" });
-OrderItem.belongsTo(Order, { foreignKey: "order_id" });
-
-// OrderItem -> GameEdition 1:1
-OrderItem.belongsTo(GameEdition, { foreignKey: "game_edition_id" });
-
-// OrderItem -> GameKey 1:1 (opcional)
-OrderItem.belongsTo(GameKey, { foreignKey: "game_key_id" });

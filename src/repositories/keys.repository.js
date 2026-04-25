@@ -1,81 +1,68 @@
-import { GameKey } from "@models";
+import { Game, GameEdition, GameKey, Order, GameAsset } from "@/models";
 
-export const checkGameKeyAvailability = async (
-  gameEditionId,
-  requiredQuantity,
-  transaction,
-) => {
-  const count = await GameKey.count({
+import { KeyStatusEnum } from "@/schemas/keys.schema";
+import { OrderStatusEnum } from "@/schemas/order.schema";
+
+export const reserveGameKeys = async (gameEditionId, quantity, orderId, t) => {
+  const keys = await GameKey.findAll({
     where: {
       game_edition_id: gameEditionId,
-      status: "AVAILABLE",
+      status: KeyStatusEnum.AVAILABLE,
     },
-    transaction,
+    limit: quantity,
+    transaction: t,
+    lock: true,
+    skipLocked: true,
   });
 
-  return count >= requiredQuantity;
-};
+  if (keys.length === 0) return 0;
 
-export const reserveGameKeys = async (
-  gameEditionId,
-  requiredQuantity,
-  orderId,
-  transaction,
-) => {
-  const reservedKeys = await GameKey.findAll({
-    where: {
-      game_edition_id: gameEditionId,
-      status: "AVAILABLE",
+  await GameKey.update(
+    {
+      status: KeyStatusEnum.RESERVED,
+      reserved_at: new Date(),
+      order_id: orderId,
     },
-    limit: requiredQuantity,
-    transaction,
-    lock: transaction.LOCK.UPDATE,
-  });
-
-  const updatePromises = reservedKeys.map((key) =>
-    key.update(
-      {
-        status: "RESERVED",
-        reserved_at: new Date(),
-        order_id: orderId,
+    {
+      where: {
+        id: keys.map((k) => k.id),
       },
-      { transaction },
-    ),
+      transaction: t,
+    },
   );
 
-  await Promise.all(updatePromises);
-  return reservedKeys;
+  return keys.length;
 };
 
-export const releaseReservedKeys = async (orderId, transaction) => {
+export const releaseReservedKeys = async (orderId, transaction = null) => {
   const releasedKeys = await GameKey.update(
     {
-      status: "AVAILABLE",
+      status: KeyStatusEnum.AVAILABLE,
       reserved_at: null,
       order_id: null,
     },
     {
       where: {
         order_id: orderId,
-        status: "RESERVED",
+        status: KeyStatusEnum.RESERVED,
       },
       transaction,
     },
   );
 
-  return releasedKeys[0]; // Return number of affected rows
+  return releasedKeys[0];
 };
 
-export const assignKeysToOrder = async (orderId, transaction) => {
+export const assignKeysToOrder = async (orderId, transaction = null) => {
   const assignedKeys = await GameKey.update(
     {
-      status: "USED",
+      status: KeyStatusEnum.SOLD,
       used_at: new Date(),
     },
     {
       where: {
         order_id: orderId,
-        status: "RESERVED",
+        status: KeyStatusEnum.RESERVED,
       },
       transaction,
     },
@@ -83,3 +70,45 @@ export const assignKeysToOrder = async (orderId, transaction) => {
 
   return assignedKeys[0]; // Return number of affected rows
 };
+
+export const findKeysByUser = (user) =>
+  GameKey.findAll({
+    include: [
+      {
+        model: Order,
+        where: { user_id: user, status: OrderStatusEnum.COMPLETED },
+      },
+      {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
+    ],
+  });
+
+export const findKeysByOrder = (order, user) =>
+  GameKey.findAll({
+    include: [
+      {
+        model: Order,
+        where: { id: order, user_id: user, status: OrderStatusEnum.COMPLETED },
+      },
+      {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
+    ],
+  });

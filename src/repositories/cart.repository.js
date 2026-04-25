@@ -1,4 +1,4 @@
-import { Cart, CartItem, GameEdition, Game } from "@models";
+import { Cart, CartItem, GameEdition, Game, GameAsset } from "@models";
 
 // Cart
 
@@ -7,7 +7,6 @@ export const getUserCartRepository = async (
   transaction = null,
 ) => {
   const cartDb = await Cart.findOne({
-    attributes: ["id"],
     where: { user_id: currentUser },
     transaction,
   });
@@ -23,14 +22,37 @@ export const createUserCartRepository = (currentUser, transaction = null) =>
 export const getUserCartItemsRepository = (currentUser) =>
   Cart.findOne({
     where: { user_id: currentUser },
-    include: { model: CartItem, include: { model: GameEdition } },
+    include: {
+      model: CartItem,
+      include: {
+        model: GameEdition,
+        include: {
+          model: Game,
+          include: [
+            {
+              model: GameAsset,
+            },
+          ],
+        },
+      },
+    },
+    order: [[CartItem, "createdAt", "DESC"]],
   });
 
 export const getCartItemsForCheckoutRepository = (cartId) =>
   CartItem.findAll({
-    attributes: ["game_edition_id", "quantity"],
     where: { cart_id: cartId },
-    include: { model: GameEdition, include: { model: Game } },
+    include: {
+      model: GameEdition,
+      include: {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+    },
   });
 
 export const createUserCartItemRepository = async (cartId, game) => {
@@ -41,9 +63,26 @@ export const createUserCartItemRepository = async (cartId, game) => {
       game_edition_id: game.game_edition_id,
       quantity: game.quantity,
     },
+    include: {
+      model: GameEdition,
+      include: {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+    },
   });
 
-  return { cartItemId: cartItemDb.id, created };
+  if (created) {
+    await cartItemDb.reload({
+      include: { model: GameEdition, include: { model: Game } },
+    });
+  }
+
+  return { cartItem: cartItemDb, created };
 };
 
 export const incrementUserCartItemRepository = (cartItemId, cartId, quantity) =>
@@ -52,8 +91,32 @@ export const incrementUserCartItemRepository = (cartItemId, cartId, quantity) =>
     { where: { id: cartItemId, cart_id: cartId } },
   );
 
-export const updateUserCartItemRepository = (cartItemId, cartId, quantity) =>
-  CartItem.update({ quantity }, { where: { id: cartItemId, cart_id: cartId } });
+export const updateUserCartItemRepository = async (
+  cartItemId,
+  cartId,
+  quantity,
+) => {
+  const result = await CartItem.update(
+    { quantity },
+    { where: { id: cartItemId, cart_id: cartId }, returning: true },
+  );
+
+  await result[1][0].reload({
+    include: {
+      model: GameEdition,
+      include: {
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
+      },
+    },
+  });
+
+  return result;
+};
 
 export const deleteUserCartItemRepository = (cartItemId, cartId) =>
   CartItem.destroy({ where: { id: cartItemId, cart_id: cartId } });

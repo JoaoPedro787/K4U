@@ -1,6 +1,10 @@
 import { DataTypes } from "sequelize";
+
 import sequelize from "@configs/db";
+
 import { generateGameKey } from "@utils/game.format";
+
+import { KeyStatusEnum } from "@/schemas/keys.schema";
 
 const Game = sequelize.define("Game", {
   id: {
@@ -13,7 +17,32 @@ const Game = sequelize.define("Game", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  thumbnail: { type: DataTypes.TEXT, allowNull: true },
+});
+
+const GameAsset = sequelize.define("GameAsset", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+
+  game_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
+  thumbnail: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  carousel: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  cover: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 const GameEdition = sequelize.define(
@@ -39,7 +68,25 @@ const GameEdition = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+
+    disabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    stock_count: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        if (this.GameKeys) {
+          return this.GameKeys.filter(
+            (key) => key.status === KeyStatusEnum.AVAILABLE,
+          ).length;
+        }
+        return 0;
+      },
+    },
   },
+
   {
     indexes: [
       {
@@ -50,69 +97,45 @@ const GameEdition = sequelize.define(
   },
 );
 
-const GameKey = sequelize.define(
-  "GameKey",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-
-    key: {
-      type: DataTypes.STRING(17),
-      allowNull: false,
-      unique: true,
-      defaultValue: generateGameKey,
-    },
-
-    status: {
-      type: DataTypes.ENUM("AVAILABLE", "RESERVED", "USED"),
-      allowNull: false,
-      defaultValue: "AVAILABLE",
-    },
-
-    reserved_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
-    used_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
-    game_edition_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    order_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
+const GameKey = sequelize.define("GameKey", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
-  {},
-);
 
-// Relations
+  key: {
+    type: DataTypes.STRING(17),
+    allowNull: false,
+    unique: true,
+    defaultValue: generateGameKey,
+  },
 
-Game.hasMany(GameEdition, {
-  foreignKey: "game_id",
-  onDelete: "CASCADE",
+  status: {
+    type: DataTypes.ENUM("AVAILABLE", "RESERVED", "SOLD"),
+    allowNull: false,
+    defaultValue: "AVAILABLE",
+  },
+
+  reserved_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+
+  used_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+
+  game_edition_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
+  order_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 });
 
-GameEdition.belongsTo(Game, {
-  foreignKey: "game_id",
-});
-
-GameEdition.hasMany(GameKey, {
-  foreignKey: "game_edition_id",
-  onDelete: "CASCADE",
-});
-
-GameKey.belongsTo(GameEdition, {
-  foreignKey: "game_edition_id",
-});
-
-export { Game, GameEdition, GameKey };
+export { Game, GameAsset, GameEdition, GameKey };
