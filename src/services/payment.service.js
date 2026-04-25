@@ -41,7 +41,7 @@ export const getOrderPaymentService = async (user, orderId) => {
 
   if (!belongs) throw new NotFound("Order not found.");
 
-  return await get(`order:${orderId}`);
+  return await get(`payment_session:${orderId}`);
 };
 
 export const cancelPayment = async (sessionId) => {
@@ -50,7 +50,7 @@ export const cancelPayment = async (sessionId) => {
 
     return true;
   } catch (err) {
-    logger.warn({ msg: "stripe expire error", err: err.message });
+    logger.warn({ msg: "stripe expiration error", err: err.message });
 
     return false;
   }

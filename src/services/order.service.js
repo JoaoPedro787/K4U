@@ -83,8 +83,16 @@ export const createFullOrderService = async (currentUser) => {
       currentUser,
     );
 
+    // Order
     await set(
-      `order:${orderDb.id}:${session.id}`,
+      `order:${orderDb.id}:${session.url}`,
+      orderDb.id,
+      minuteToSeconds(Settings.STRIPE_EXPIRE_MINUTE),
+    );
+
+    // Session
+    await set(
+      `payment_session:${orderDb.id}`,
       session.url,
       minuteToSeconds(Settings.STRIPE_EXPIRE_MINUTE),
     );
