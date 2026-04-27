@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ path: `${process.cwd()}/.env` });
+
 export default class Settings {
   // CORE
   static PORT = process.env.PORT;

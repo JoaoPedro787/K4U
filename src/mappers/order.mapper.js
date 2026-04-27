@@ -5,6 +5,7 @@ export const mapOrder = (row) => {
     id: row.public_id,
     items: row.OrderItems.map((el) => ({
       id: el.public_id,
+      game_id: el.GameEdition.public_id,
       game_name: el.GameEdition.Game.name,
       game_cover: el.GameEdition.Game?.GameAsset?.cover ?? null,
       platform: el.GameEdition.platform,

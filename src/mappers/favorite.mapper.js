@@ -3,7 +3,7 @@ export const mapFavoriteGamesPublic = (row) => ({
   game_id: row.GameEdition.id,
   game_name: row.GameEdition.Game.name,
   game_platform: row.GameEdition.platform,
-  game_thumbnail: row.GameEdition.Game?.GameAsset?.thumbnail ?? null,
+  game_cover: row.GameEdition.Game?.GameAsset?.cover ?? null,
   game_price: row.GameEdition.price,
 });
 

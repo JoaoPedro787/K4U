@@ -5,7 +5,7 @@ import { createClient } from "redis";
 import Settings from "@/settings";
 
 const redis = createClient({
-  url: Settings.REDIS_HOST,
+  //url: Settings.REDIS_HOST,
 });
 
 const logger = pino();
