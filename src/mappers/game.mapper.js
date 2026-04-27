@@ -10,6 +10,7 @@ export const mapGameEditionPublic = (row) => {
     thumbnail: row.Game.GameAsset?.thumbnail ?? null,
     cover: row.Game.GameAsset?.cover ?? null,
     carousel: row.Game.GameAsset?.carousel ?? null,
+    released_at: row.Game.released_at,
   };
 };
 

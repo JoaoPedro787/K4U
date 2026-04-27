@@ -17,6 +17,8 @@ const Game = sequelize.define("Game", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+
+  released_at: { type: DataTypes.DATE, allowNull: false },
 });
 
 const GameAsset = sequelize.define("GameAsset", {

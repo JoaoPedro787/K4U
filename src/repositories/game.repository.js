@@ -24,11 +24,13 @@ export const getAllGamesEditionRepository = (page, search, limit, orderBy) =>
       {
         model: GameKey,
         where: { status: KeyStatusEnum.AVAILABLE },
+        separate: true,
       },
     ],
     offset: (page - 1) * limit,
     limit,
-    order: [orderBy],
+    order: orderBy,
+    subQuery: false,
     distinct: true,
   });
 

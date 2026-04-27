@@ -22,22 +22,22 @@ export const getAllGamesEditionService = async (
 ) => {
   switch (orderBy) {
     case "newest":
-      orderBy = ["createdAt", "DESC"];
+      orderBy = [["Game", "released_at", "DESC"]];
       break;
     case "oldest":
-      orderBy = ["createdAt", "ASC"];
+      orderBy = [["Game", "released_at", "ASC"]];
       break;
     case "price_desc":
-      orderBy = ["price", "DESC"];
+      orderBy = [["price", "DESC"]];
       break;
     case "price_asc":
-      orderBy = ["price", "ASC"];
+      orderBy = [["price", "ASC"]];
       break;
     case "random":
       orderBy = sequelize.random();
       break;
     default:
-      orderBy = ["createdAt", "DESC"];
+      orderBy = [["Game", "released_at", "DESC"]];
   }
 
   const { count, rows } = await getAllGamesEditionRepository(
