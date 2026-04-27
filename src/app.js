@@ -39,14 +39,3 @@ app.use("/auth", authRouter);
 app.use("/games", gameRouter);
 app.use("/payment", paymentRouter);
 app.use(errorHandler);
-
-// COLCOAR THUMBNAIL DOS GAMES NO KEYS | NOVA TABELA PARA WALLPAPER CARROSEL
-// AO VOLTAR COM A SETA, ELE CANCELA A ORDER
-
-// aqui eu vi vantagem:
-// // No seu serviço de limpeza de pedidos expirados:
-// const session = await stripe.checkout.sessions.expire(order.stripeSessionId);
-
-// VOU VOLTAR COM O REDIS
-
-// criar nova session stripe ao cancelar

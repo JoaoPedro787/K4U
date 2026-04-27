@@ -57,38 +57,3 @@ export const handleWebhook = async (req, res, next) => {
     order_id: data,
   });
 };
-
-export const getPaymentSuccess = async (req, res, next) => {
-  const { session_id } = req.query;
-
-  if (!session_id) {
-    return next(new BadRequest("Session ID is required"));
-  }
-
-  req.logMessage = "payment completed";
-  req.logExtras = {
-    payment_session: session_id,
-  };
-
-  res.status(200).json({
-    message: "Payment completed successfully",
-    data: {
-      sessionId: session_id,
-    },
-  });
-};
-
-export const getPaymentCancel = async (req, res) => {
-  const event = req.stripeEvent;
-
-  const session = event.data.object;
-
-  req.logMessage = "payment canceled";
-  req.logExtras = {
-    payment_session: session,
-  };
-
-  res.status(200).json({
-    message: "Payment was cancelled",
-  });
-};
