@@ -33,10 +33,6 @@ const GameAsset = sequelize.define("GameAsset", {
     allowNull: false,
   },
 
-  thumbnail: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   carousel: {
     type: DataTypes.STRING,
     allowNull: true,

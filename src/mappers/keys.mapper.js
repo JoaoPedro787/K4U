@@ -6,7 +6,7 @@ export const mapKeyToRep = (key) => ({
   game_edition_id: key.game_edition_id,
   game_name: key.GameEdition.Game.name,
   platform: key.GameEdition.platform,
-  game_thumbnail: key.GameEdition.Game?.GameAsset?.thumbnail ?? null,
+  game_cover: key.GameEdition.Game?.GameAsset?.cover ?? null,
   used_at: key.used_at,
 });
 
