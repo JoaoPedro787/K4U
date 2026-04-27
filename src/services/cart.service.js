@@ -20,7 +20,8 @@ export const getUserCartItemsService = async (currentUser) => {
 };
 
 export const createUserCartItemService = async (currentUser, game) => {
-  if (!(await retrieveGameEditionRepository(game.game_edition_id))) {
+  const gameDb = await retrieveGameEditionRepository(game.game_edition_id);
+  if (!gameDb) {
     throw new NotFound("Game not found.");
   }
 
@@ -28,7 +29,8 @@ export const createUserCartItemService = async (currentUser, game) => {
 
   let { cartItem, created } = await repositories.createUserCartItemRepository(
     cartId,
-    game,
+    gameDb.id,
+    game.quantity,
   );
 
   if (!created) {
@@ -46,14 +48,18 @@ export const createUserCartItemService = async (currentUser, game) => {
   return rep;
 };
 
-export const updateUserCartItemService = async (currentUser, cartItem) => {
+export const updateUserCartItemService = async (
+  currentUser,
+  cartItemId,
+  quantity,
+) => {
   const cartId = await repositories.getUserCartRepository(currentUser);
 
   const [numberOfAffectedRows, updatedRows] =
     await repositories.updateUserCartItemRepository(
-      cartItem.id,
+      cartItemId,
       cartId,
-      cartItem.quantity,
+      quantity,
     );
 
   if (!numberOfAffectedRows)

@@ -34,16 +34,14 @@ export const postFavoriteGame = async (req, res, next) => {
 
 export const deleteFavoriteGame = async (req, res, next) => {
   const currentUser = req.user;
-  const favorite = req.body;
+  const id = req.params.id;
 
-  const { error } = await to(
-    deleteUserFavoriteGameService(currentUser, favorite.id),
-  );
+  const { error } = await to(deleteUserFavoriteGameService(currentUser, id));
 
   if (error) return next(error);
 
   req.logMessage = "user removed game to favorites";
-  req.logExtras = { favorite_id: favorite.id };
+  req.logExtras = { favorite_id: id };
 
   res.status(204).send();
 };

@@ -55,13 +55,17 @@ export const getCartItemsForCheckoutRepository = (cartId) =>
     },
   });
 
-export const createUserCartItemRepository = async (cartId, game) => {
+export const createUserCartItemRepository = async (
+  cartId,
+  gameId,
+  quantity,
+) => {
   const [cartItemDb, created] = await CartItem.findOrCreate({
-    where: { cart_id: cartId, game_edition_id: game.game_edition_id },
+    where: { cart_id: cartId, game_edition_id: gameId },
     defaults: {
       cart_id: cartId,
-      game_edition_id: game.game_edition_id,
-      quantity: game.quantity,
+      game_edition_id: gameId,
+      quantity: quantity,
     },
     include: {
       model: GameEdition,
@@ -98,7 +102,7 @@ export const updateUserCartItemRepository = async (
 ) => {
   const result = await CartItem.update(
     { quantity },
-    { where: { id: cartItemId, cart_id: cartId }, returning: true },
+    { where: { public_id: cartItemId, cart_id: cartId }, returning: true },
   );
 
   await result[1][0].reload({
@@ -119,7 +123,7 @@ export const updateUserCartItemRepository = async (
 };
 
 export const deleteUserCartItemRepository = (cartItemId, cartId) =>
-  CartItem.destroy({ where: { id: cartItemId, cart_id: cartId } });
+  CartItem.destroy({ where: { public_id: cartItemId, cart_id: cartId } });
 
 export const deleteAllUserCartItemRepository = (cartId, transaction = null) =>
   CartItem.destroy({ where: { cart_id: cartId }, transaction });

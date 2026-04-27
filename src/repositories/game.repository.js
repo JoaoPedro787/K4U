@@ -48,5 +48,5 @@ export const retrieveGameEditionRepository = (game_id) =>
         where: { status: KeyStatusEnum.AVAILABLE },
       },
     ],
-    where: { id: game_id },
+    where: { public_id: game_id },
   });

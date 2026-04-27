@@ -46,5 +46,5 @@ export const listUserFavoriteGamesRepository = (currentUser) =>
 
 export const deleteUserFavoriteGameRepository = (currentUser, favoriteId) =>
   FavoriteGame.destroy({
-    where: { id: favoriteId, user_id: currentUser },
+    where: { public_id: favoriteId, user_id: currentUser },
   });

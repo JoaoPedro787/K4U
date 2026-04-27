@@ -2,11 +2,8 @@ import { Router } from "express";
 
 import * as controller from "@controllers/cart.controller";
 
-import {
-  CartItemCreate,
-  CartItemUpdate,
-  CartItemDelete,
-} from "@/schemas/cart.schema";
+import { ParamId } from "@/schemas/global.schema";
+import { CartItemCreate, CartItemUpdate } from "@/schemas/cart.schema";
 
 import { schemaValidation } from "@/utils/schema.validation";
 
@@ -21,14 +18,15 @@ router.post(
 );
 
 router.patch(
-  "/items",
+  "/items/:id",
+  schemaValidation(ParamId, "PARAMS"),
   schemaValidation(CartItemUpdate),
   controller.updateUserCartItem,
 );
 
 router.delete(
-  "/items",
-  schemaValidation(CartItemDelete),
+  "/items/:id",
+  schemaValidation(ParamId, "PARAMS"),
   controller.deleteUserCartItem,
 );
 

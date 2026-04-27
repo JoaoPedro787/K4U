@@ -33,32 +33,31 @@ export const postUserCartItems = async (req, res, next) => {
 
 export const updateUserCartItem = async (req, res, next) => {
   const user = req.user;
-  const cartItem = req.body;
+  const id = req.params.id;
+  const { quantity } = req.body;
 
   const { error, data } = await to(
-    services.updateUserCartItemService(user, cartItem),
+    services.updateUserCartItemService(user, id, quantity),
   );
 
   if (error) return next(error);
 
   req.logMessage = "user updated a game from cart";
-  req.logExtras = { cart_item_id: cartItem.id, quantity: cartItem.quantity };
+  req.logExtras = { cart_item_id: id, quantity: quantity };
 
   res.status(200).json(data);
 };
 
 export const deleteUserCartItem = async (req, res, next) => {
   const user = req.user;
-  const cartItemId = req.body.id;
+  const id = req.params.id;
 
-  const { error } = await to(
-    services.deleteUserCartItemService(user, cartItemId),
-  );
+  const { error } = await to(services.deleteUserCartItemService(user, id));
 
   if (error) return next(error);
 
   req.logMessage = "user deleted a game from cart";
-  req.logExtras = { cart_item_id: cartItemId };
+  req.logExtras = { cart_item_id: id };
 
   res.status(204).send();
 };

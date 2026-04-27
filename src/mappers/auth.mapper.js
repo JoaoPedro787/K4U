@@ -9,7 +9,7 @@ export const mapUserToDb = (user, hashedPassword) => {
 
 export const mapUserToRep = (userDb) => {
   return {
-    id: userDb.id,
+    id: userDb.public_id,
     username: userDb.username,
     email: userDb.email,
     profile_photo: userDb.profile_photo,

@@ -2,8 +2,9 @@ export const mapOrder = (row) => {
   if (!row) return null;
 
   return {
-    id: row.id,
+    id: row.public_id,
     items: row.OrderItems.map((el) => ({
+      id: el.public_id,
       game_name: el.GameEdition.Game.name,
       game_thumbnail: el.GameEdition.Game?.GameAsset?.thumbnail ?? null,
       platform: el.GameEdition.platform,

@@ -97,7 +97,11 @@ export const findKeysByOrder = (order, user) =>
     include: [
       {
         model: Order,
-        where: { id: order, user_id: user, status: OrderStatusEnum.COMPLETED },
+        where: {
+          public_id: order,
+          user_id: user,
+          status: OrderStatusEnum.COMPLETED,
+        },
       },
       {
         model: GameEdition,

@@ -1,5 +1,5 @@
 export const mapKeyToRep = (key) => ({
-  id: key.id,
+  id: key.public_id,
   key: key.key,
   status: key.status,
   order_id: key.order_id,

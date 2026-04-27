@@ -92,7 +92,7 @@ export const createFullOrderService = async (currentUser) => {
 
     // Session
     await set(
-      `payment_session:${orderDb.id}`,
+      `payment_session:${orderDb.public_id}`,
       session.url,
       minuteToSeconds(Settings.STRIPE_EXPIRE_MINUTE),
     );

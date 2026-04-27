@@ -1,5 +1,5 @@
 export const mapFavoriteGamesPublic = (row) => ({
-  id: row.id,
+  id: row.public_id,
   game_id: row.GameEdition.id,
   game_name: row.GameEdition.Game.name,
   game_platform: row.GameEdition.platform,

@@ -54,6 +54,12 @@ const GameEdition = sequelize.define(
       primaryKey: true,
     },
 
+    public_id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      unique: true,
+    },
+
     platform: {
       type: DataTypes.ENUM("PC", "XBOX", "PLAYSTATION"),
       allowNull: false,
@@ -69,11 +75,6 @@ const GameEdition = sequelize.define(
       allowNull: false,
     },
 
-    disabled: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
     stock_count: {
       type: DataTypes.VIRTUAL,
       get() {
@@ -87,55 +88,58 @@ const GameEdition = sequelize.define(
     },
   },
 
-  {
-    indexes: [
-      {
-        unique: true,
-        fields: ["game_id", "platform"],
-      },
-    ],
-  },
+  { indexes: [{ unique: true, fields: ["public_id"] }] },
 );
 
-const GameKey = sequelize.define("GameKey", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+const GameKey = sequelize.define(
+  "GameKey",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-  key: {
-    type: DataTypes.STRING(17),
-    allowNull: false,
-    unique: true,
-    defaultValue: generateGameKey,
-  },
+    public_id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      unique: true,
+    },
 
-  status: {
-    type: DataTypes.ENUM("AVAILABLE", "RESERVED", "SOLD"),
-    allowNull: false,
-    defaultValue: "AVAILABLE",
-  },
+    key: {
+      type: DataTypes.STRING(17),
+      allowNull: false,
+      unique: true,
+      defaultValue: generateGameKey,
+    },
 
-  reserved_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
+    status: {
+      type: DataTypes.ENUM("AVAILABLE", "RESERVED", "SOLD"),
+      allowNull: false,
+      defaultValue: "AVAILABLE",
+    },
 
-  used_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
+    reserved_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
 
-  game_edition_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+    used_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
 
-  order_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
+    game_edition_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+
+    order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
-});
+  { indexes: [{ unique: true, fields: ["public_id"] }] },
+);
 
 export { Game, GameAsset, GameEdition, GameKey };

@@ -10,7 +10,7 @@ export const createOrderRepository = async (currentUser, transaction = null) =>
 
 export const getOrderRepository = (currentUser, orderId) =>
   Order.findOne({
-    where: { user_id: currentUser, id: orderId },
+    where: { user_id: currentUser, public_id: orderId },
     include: {
       model: OrderItem,
       include: {
@@ -29,7 +29,11 @@ export const getOrderRepository = (currentUser, orderId) =>
 
 export const userBelongsToOrder = (user, orderId) =>
   Order.findOne({
-    where: { user_id: user, id: orderId, status: OrderStatusEnum.PENDING },
+    where: {
+      user_id: user,
+      public_id: orderId,
+      status: OrderStatusEnum.PENDING,
+    },
   });
 
 export const getUserOrderRepository = (currentUser) =>
@@ -51,19 +55,6 @@ export const getUserOrderRepository = (currentUser) =>
     },
     order: [["createdAt", "DESC"]],
   });
-
-export const deleteExpiredOrdersRepo = (transaction = null) =>
-  Order.update(
-    { status: OrderStatusEnum.CANCELED },
-    {
-      where: {
-        status: OrderStatusEnum.PENDING,
-        expire_date: { [Op.lte]: new Date() },
-      },
-      returning: true,
-      transaction,
-    },
-  );
 
 export const cancelOrderRepository = async (orderId) => {
   const [affectedCount] = await Order.update(
