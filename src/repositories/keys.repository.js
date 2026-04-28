@@ -46,6 +46,8 @@ export const releaseReservedKeys = async (orderId, transaction = null) => {
         order_id: orderId,
         status: KeyStatusEnum.RESERVED,
       },
+
+      include: { model: Order },
       transaction,
     },
   );
@@ -64,6 +66,8 @@ export const assignKeysToOrder = async (orderId, transaction = null) => {
         order_id: orderId,
         status: KeyStatusEnum.RESERVED,
       },
+      include: { model: Order },
+
       transaction,
     },
   );

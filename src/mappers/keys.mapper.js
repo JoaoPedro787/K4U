@@ -2,7 +2,7 @@ export const mapKeyToRep = (key) => ({
   id: key.public_id,
   key: key.key,
   status: key.status,
-  order_id: key.order_id,
+  order_id: key.Order.public_id,
   game_edition_id: key.game_edition_id,
   game_name: key.GameEdition.Game.name,
   platform: key.GameEdition.platform,
