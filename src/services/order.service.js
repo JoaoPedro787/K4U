@@ -77,6 +77,7 @@ export const createFullOrderService = async (currentUser) => {
 
     // Payment session
     const session = await sessionMaker(
+      orderDb.id,
       orderDb.public_id,
       lineItems,
       email,

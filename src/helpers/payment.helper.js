@@ -16,7 +16,13 @@ export const mapToLineItems = (orderItems) =>
     quantity: item.quantity,
   }));
 
-export const sessionMaker = async (orderId, lineItems, email, userId) =>
+export const sessionMaker = async (
+  orderId,
+  public_id,
+  lineItems,
+  email,
+  userId,
+) =>
   await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: lineItems,
@@ -24,7 +30,7 @@ export const sessionMaker = async (orderId, lineItems, email, userId) =>
       Math.floor(Date.now() / 1000) + Settings.STRIPE_EXPIRE_MINUTE * 60,
     customer_email: email,
     mode: "payment",
-    success_url: `${Settings.FRONTEND_BASE_URL}/payment/success?order_id=${orderId}`,
+    success_url: `${Settings.FRONTEND_BASE_URL}/payment/success?order_id=${public_id}`,
     cancel_url: `${Settings.FRONTEND_BASE_URL}/orders`,
     metadata: {
       order_id: orderId,
