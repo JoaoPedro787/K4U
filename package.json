@@ -8,7 +8,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx babel-node src/server.js | pino-pretty ",
+    "build": "babel src -d dist",
+    "start": "node dist/server.js | pino-pretty",
     "dev": "nodemon src/server.js --exec babel-node | pino-pretty"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.6",
+    "@babel/cli": "^7.28.6",
     "@babel/node": "^7.28.6",
     "@babel/preset-env": "^7.28.6",
     "babel-plugin-module-resolver": "^5.0.2",
