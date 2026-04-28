@@ -42,8 +42,8 @@ This repository contains the API. The `FRONTEND_BASE_URL` variable in `.env.exam
 
 You can test the project live using the following links:
 
-- **Frontend (UI):** [INSERT_LINK_HERE]
-- **Backend (API):** [INSERT_LINK_HERE]
+- **Frontend (UI):** [https://k4u-7788.lovable.app]
+- **Backend (API):** [https://k4u.onrender.com]
 
 > **Note:** To test the checkout flow, please use Stripe's test card credentials.
 
