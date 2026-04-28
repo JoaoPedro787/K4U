@@ -4,27 +4,26 @@ export const createNewFavoriteGameRepository = async (
   currentUser,
   game_edition_id,
 ) => {
-  const [favoriteDb, created] = await FavoriteGame.findOrCreate({
-    where: { user_id: currentUser, game_edition_id: game_edition_id },
+  const result = await FavoriteGame.create({
+    user_id: currentUser,
+    game_edition_id: game_edition_id,
   });
 
-  if (created) {
-    await favoriteDb.reload({
+  await result.reload({
+    include: {
+      model: GameEdition,
       include: {
-        model: GameEdition,
-        include: {
-          model: Game,
-          include: [
-            {
-              model: GameAsset,
-            },
-          ],
-        },
+        model: Game,
+        include: [
+          {
+            model: GameAsset,
+          },
+        ],
       },
-    });
-  }
+    },
+  });
 
-  return { favoriteDb, created };
+  return result;
 };
 
 export const listUserFavoriteGamesRepository = (currentUser) =>

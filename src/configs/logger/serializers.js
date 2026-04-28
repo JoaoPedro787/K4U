@@ -18,5 +18,6 @@ export const serializeError = (err) => {
   return {
     type: err.type,
     message: err.message.toLowerCase() || "Internal server error",
+    stack: err.stack,
   };
 };

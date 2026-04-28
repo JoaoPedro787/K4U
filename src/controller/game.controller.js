@@ -11,7 +11,15 @@ export const getAllGamesEdtion = async (req, res) => {
   const orderBy = req.query.order_by || "newest";
   const search = req.query.search || null;
 
-  const result = await getAllGamesEditionService(page, search, limit, orderBy);
+  const user = req.user;
+
+  const result = await getAllGamesEditionService(
+    page,
+    search,
+    limit,
+    orderBy,
+    user,
+  );
 
   res.json(result);
 };
@@ -19,7 +27,9 @@ export const getAllGamesEdtion = async (req, res) => {
 export const retrieveGameEdition = async (req, res, next) => {
   const editionId = req.params.id;
 
-  const { data, error } = await to(retrieveGameEditionService(editionId));
+  const user = req.user;
+
+  const { data, error } = await to(retrieveGameEditionService(editionId, user));
 
   if (error) return next(error);
 

@@ -34,8 +34,8 @@ app.use(logger);
 
 app.get("/", (_req, res) => res.json({ hello: "Hello, World!" }));
 
-app.use("/users", verifyAuthentication, userRouter);
+app.use("/users", verifyAuthentication(), userRouter);
 app.use("/auth", authRouter);
-app.use("/games", gameRouter);
+app.use("/games", verifyAuthentication(true), gameRouter);
 app.use("/payment", paymentRouter);
 app.use(errorHandler);

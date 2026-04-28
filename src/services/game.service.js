@@ -19,6 +19,7 @@ export const getAllGamesEditionService = async (
   search,
   limit,
   orderBy,
+  user,
 ) => {
   switch (orderBy) {
     case "newest":
@@ -45,6 +46,7 @@ export const getAllGamesEditionService = async (
     search,
     limit,
     orderBy,
+    user,
   );
 
   const pagination = gameAllPagination(page, limit, orderBy, count);
@@ -54,8 +56,8 @@ export const getAllGamesEditionService = async (
   return { games: mapped, ...pagination };
 };
 
-export const retrieveGameEditionService = async (game_id) => {
-  const gameDb = await retrieveGameEditionRepository(game_id);
+export const retrieveGameEditionService = async (game_id, user) => {
+  const gameDb = await retrieveGameEditionRepository(game_id, user);
 
   if (!gameDb) throw new NotFound("Game not found.");
 

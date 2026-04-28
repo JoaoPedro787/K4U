@@ -6,26 +6,27 @@ import { get } from "@/configs/redis";
 
 import { Unauthorized } from "@/exceptions/http.exception";
 
-export const verifyAuthentication = async (req, _res, next) => {
-  const token = req.signedCookies.access_token;
+export const verifyAuthentication = (pass = false) => {
+  return async (req, _res, next) => {
+    const token = req.signedCookies.access_token;
 
-  try {
-    // Checking if token is revoked
-    if (await get(`revoked:${token}`)) throw new jwt.JsonWebTokenError();
+    if (!token) {
+      if (pass) return next();
+      return next(new Unauthorized("Token não encontrado"));
+    }
 
-    const verified = jwt.verify(token, Settings.JWT_SECRET);
+    try {
+      const isRevoked = await get(`revoked:${token}`);
+      if (isRevoked) throw new Error("Revogado");
 
-    req.user = verified.user_id;
+      const verified = jwt.verify(token, Settings.JWT_SECRET);
 
-    return next();
-  } catch (err) {
-    if (err instanceof jwt.TokenExpiredError)
-      return next(
-        new Unauthorized("Session expired. Please try signing in again."),
-      );
+      req.user = verified.user_id;
 
-    return next(
-      new Unauthorized("Your session is invalid. Please log in again"),
-    );
-  }
+      return next();
+    } catch (err) {
+      if (pass) return next();
+      return next(new Unauthorized("Inválido"));
+    }
+  };
 };

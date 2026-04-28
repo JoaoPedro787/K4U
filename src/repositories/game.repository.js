@@ -1,9 +1,15 @@
-import { GameEdition, Game, GameKey, GameAsset } from "@/models";
+import { GameEdition, Game, GameKey, GameAsset, FavoriteGame } from "@/models";
 import { KeyStatusEnum } from "@/schemas/keys.schema";
 
 import { Op } from "sequelize";
 
-export const getAllGamesEditionRepository = (page, search, limit, orderBy) =>
+export const getAllGamesEditionRepository = (
+  page,
+  search,
+  limit,
+  orderBy,
+  userId = null,
+) =>
   GameEdition.findAndCountAll({
     include: [
       {
@@ -26,6 +32,11 @@ export const getAllGamesEditionRepository = (page, search, limit, orderBy) =>
         where: { status: KeyStatusEnum.AVAILABLE },
         separate: true,
       },
+      {
+        model: FavoriteGame,
+        where: { user_id: userId },
+        required: false,
+      },
     ],
     offset: (page - 1) * limit,
     limit,
@@ -34,7 +45,7 @@ export const getAllGamesEditionRepository = (page, search, limit, orderBy) =>
     distinct: true,
   });
 
-export const retrieveGameEditionRepository = (game_id) =>
+export const retrieveGameEditionRepository = (game_id, userId = null) =>
   GameEdition.findOne({
     include: [
       {
@@ -48,6 +59,11 @@ export const retrieveGameEditionRepository = (game_id) =>
       {
         model: GameKey,
         where: { status: KeyStatusEnum.AVAILABLE },
+      },
+      {
+        model: FavoriteGame,
+        where: { user_id: userId },
+        required: false,
       },
     ],
     where: { public_id: game_id },

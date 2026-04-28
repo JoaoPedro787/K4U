@@ -84,6 +84,13 @@ const GameEdition = sequelize.define(
         return 0;
       },
     },
+
+    is_favorite: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return !!(this.FavoriteGames && this.FavoriteGames.length > 0);
+      },
+    },
   },
 
   { indexes: [{ unique: true, fields: ["public_id"] }] },

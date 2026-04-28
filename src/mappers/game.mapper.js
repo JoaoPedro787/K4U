@@ -9,6 +9,7 @@ export const mapGameEditionPublic = (row) => {
     stock_count: row.stock_count,
     cover: row.Game.GameAsset?.cover ?? null,
     carousel: row.Game.GameAsset?.carousel ?? null,
+    is_favorite: row.is_favorite,
     released_at: row.Game.released_at,
   };
 };

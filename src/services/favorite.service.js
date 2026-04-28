@@ -24,19 +24,23 @@ export const listUserFavoriteGamesService = async (currentUser) => {
 export const createNewFavoriteGameService = async (currentUser, favorite) => {
   const { game_edition_id } = favorite;
 
-  const game = await retrieveGameEditionRepository(game_edition_id);
+  const game = await retrieveGameEditionRepository(
+    game_edition_id,
+    currentUser,
+  );
 
   if (!game) {
     throw new NotFound("Game not found.");
   }
 
-  const { favoriteDb, created } = await createNewFavoriteGameRepository(
+  if (game.is_favorite) {
+    throw new Conflict("The game is already in the user's favorites list.");
+  }
+
+  const favoriteDb = await createNewFavoriteGameRepository(
     currentUser,
     game.id,
   );
-
-  if (!created)
-    throw new Conflict("The game is already in the user's favorites list.");
 
   const rep = mapFavoriteGamesPublic(favoriteDb);
 
