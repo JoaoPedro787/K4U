@@ -44,6 +44,7 @@ You can test the project live using the following links:
 
 - **Frontend (UI):** [https://k4u-7788.lovable.app]
 - **Backend (API):** [https://k4u.onrender.com]
+- - **Preview video (Youtube):** [https://youtu.be/L7e_x9K0PC8]
 
 > **Note:** To test the checkout flow, please use Stripe's test card credentials.
 
